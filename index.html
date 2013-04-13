@@ -101,7 +101,7 @@
 
     function drawCalls(diagram, actorPositions) {
         var SPAN = 40;
-        var lastY = 90;
+        var lastY = 100;
         var i;
 
         for (i = 0; i < diagram.length; i++) {
@@ -109,10 +109,17 @@
             var toActor = diagram[i][1];
             var from = actorPositions[fromActor] + "," + lastY;
 
+            var mixX = (actorPositions[fromActor] + actorPositions[toActor])/2;
+            var label = paper.text(mixX, lastY - 10, diagram[i][2]);
+            label.attr({ "font-size": 16 });
+
             if (fromActor == toActor) {
                 paper.path("M" + from + "l35,0l0," + SPAN + "l-35,0");
                 lastY += SPAN;
                 drawArrow(actorPositions[toActor], lastY, false);
+                label.attr({
+                    x: actorPositions[fromActor] + 10,
+                    "text-anchor": "start"});
             }
             else {
                 var to = actorPositions[toActor] + "," + lastY;
@@ -121,7 +128,6 @@
                 paper.path("M" + from + "L" + to);
                 drawArrow(actorPositions[toActor], lastY, pointRight);
             }
-
 
             lastY += SPAN;
         }
