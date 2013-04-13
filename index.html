@@ -39,11 +39,12 @@
         });
         textElement.toFront();
 
-        var lifeLine = paper.path("M" + (rect.x + rect.width/2) + "," + (rect.y + rect.height + 5) + "V1000");
+        var lifelinePath = "M" + (rect.x + rect.width/2) + "," + (rect.y + rect.height + 5) + "V1000";
+        var lifeLine = paper.path(lifelinePath);
         lifeLine.attr({ "stroke-dasharray": "--" });
         lifeLine.toBack();
 
-        return rect.x + rect.width + 10;
+        return rect.x + rect.width + 5;
     }
 
     function uniqueActorSet(diagram) {
@@ -66,14 +67,43 @@
         return result;
     }
 
-    function drawDiagram(diagram) {
+    function drawActors(diagram) {
         var i;
         var lastX = 10;
         var uniqueActors = uniqueActorSet(diagram);
+        var actorPositions = {};
 
         for (i = 0; i < uniqueActors.length; i++) {
-            lastX = drawActor(uniqueActors[i], lastX) + 10;
+            var newX = drawActor(uniqueActors[i], lastX);
+            var midX = (newX + lastX) / 2;
+            lastX = newX + 10;
+
+            actorPositions[uniqueActors[i]] = midX;
         }
+
+        return actorPositions;
+    }
+
+    function drawCalls(diagram, actorPositions) {
+        var SPAN = 40;
+        var lastY = 90;
+        var i;
+
+        for (i = 0; i < diagram.length; i++) {
+            var fromActor = diagram[i][0];
+            var toActor = diagram[i][1];
+            var from = actorPositions[fromActor] + "," + lastY;
+            var to = actorPositions[toActor] + "," + lastY;
+
+            paper.path("M" + from + "L" + to);
+            lastY += SPAN;
+        }
+    }
+
+    function drawDiagram(diagram) {
+        var actorPositions = drawActors(diagram);
+
+        drawCalls(diagram, actorPositions);
     }
 
     drawDiagram([
