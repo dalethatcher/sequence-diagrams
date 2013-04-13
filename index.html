@@ -84,6 +84,21 @@
         return actorPositions;
     }
 
+    function drawArrow(x, y, pointRight) {
+        var ARROW_WIDTH = 10;
+        var ARROW_HEIGHT = 10;
+        var HALF_ARROW_HEIGHT = ARROW_HEIGHT/2;
+        var xDelta = pointRight ? -ARROW_WIDTH : ARROW_WIDTH;
+        var path = paper.path(
+                "M" + x + "," + y +
+                "l" + xDelta + "," + -HALF_ARROW_HEIGHT +
+                "l0," + ARROW_HEIGHT +
+                "Z");
+        path.attr({
+            fill: 'black'
+        });
+    }
+
     function drawCalls(diagram, actorPositions) {
         var SPAN = 40;
         var lastY = 90;
@@ -93,9 +108,21 @@
             var fromActor = diagram[i][0];
             var toActor = diagram[i][1];
             var from = actorPositions[fromActor] + "," + lastY;
-            var to = actorPositions[toActor] + "," + lastY;
 
-            paper.path("M" + from + "L" + to);
+            if (fromActor == toActor) {
+                paper.path("M" + from + "l35,0l0," + SPAN + "l-35,0");
+                lastY += SPAN;
+                drawArrow(actorPositions[toActor], lastY, false);
+            }
+            else {
+                var to = actorPositions[toActor] + "," + lastY;
+                var pointRight = actorPositions[toActor] > actorPositions[fromActor];
+
+                paper.path("M" + from + "L" + to);
+                drawArrow(actorPositions[toActor], lastY, pointRight);
+            }
+
+
             lastY += SPAN;
         }
     }
