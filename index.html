@@ -46,9 +46,23 @@
         return rect.x + rect.width + 10;
     }
 
-    var lastX = drawActor("Alice", 10);
-    lastX = drawActor("Bob", lastX + 10);
-    drawActor("Charlie", lastX + 10);
+    function drawDiagram(diagram) {
+        var i;
+        var lastX = 10;
+
+        for (i = 0; i < diagram.length; i++) {
+            var from = diagram[i][0];
+
+            lastX = drawActor(from, lastX) + 10;
+        }
+    }
+
+    drawDiagram([
+            ["Alice", "Bob", "calls"],
+            ["Bob", "Charlie", "passes"],
+            ["Charlie", "Charlie", "invokes"],
+            ["Charlie", "Alice", "returns"]
+    ]);
 
 </script>
 </body>
