@@ -46,14 +46,33 @@
         return rect.x + rect.width + 10;
     }
 
+    function uniqueActorSet(diagram) {
+        var result = [];
+        var found = {};
+        var i;
+
+        function addIfNew(actor) {
+            if (!found[actor]) {
+                result[result.length] = actor;
+                found[actor] = 1;
+            }
+        }
+
+        for (i = 0; i < diagram.length; i++) {
+            addIfNew(diagram[i][0]);
+            addIfNew(diagram[i][1]);
+        }
+
+        return result;
+    }
+
     function drawDiagram(diagram) {
         var i;
         var lastX = 10;
+        var uniqueActors = uniqueActorSet(diagram);
 
-        for (i = 0; i < diagram.length; i++) {
-            var from = diagram[i][0];
-
-            lastX = drawActor(from, lastX) + 10;
+        for (i = 0; i < uniqueActors.length; i++) {
+            lastX = drawActor(uniqueActors[i], lastX) + 10;
         }
     }
 
