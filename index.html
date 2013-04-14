@@ -1,29 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bootstrap 101 Template</title>
+    <title>Instant Sequence Diagrams</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="layout/layout-default-latest.css" rel="stylesheet">
+    <style type="text/css">
+        #sequence-description {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* Opera/IE 8+ */
+        }
+    </style>
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row-fluid">
-        <div class="span4">
-            <textarea id="sequence-description">Alice->Bob:calls
+<div class="ui-layout-center">
+    <div id="drawing"></div>
+</div>
+<div class="ui-layout-west"><textarea id="sequence-description">Alice->Bob:calls
 Bob->Charlie:passes
 Charlie->Charlie:invokes
 Charlie->Alice:returns
 Alice->Bob</textarea>
-        </div>
-        <div class="span8" id="drawing">
-        </div>
-    </div>
 </div>
-<script src="http://code.jquery.com/jquery.js"></script>
+</body>
+
+<script src="jquery/js/jquery-1.9.1.js"></script>
+<script src="jquery/js/jquery-ui-1.10.2.custom.min.js"></script>
 <script src="bootstrap/js/bootstrap.min.js"></script>
 <script src="raphael/js/raphael-min.js"></script>
+<script src="layout/jquery.layout-latest.min.js"></script>
 <script lang="text/javascript">
+    $('body').layout({
+        west: {
+            resizable: true
+        }
+    });
+
     var paper = new Raphael(document.getElementById('drawing'), 1000, 1000);
 
     function drawActor(name, x) {
@@ -33,7 +51,7 @@ Alice->Bob</textarea>
             'text-anchor': 'start'
         });
         var rect = textElement.getBBox();
-        textElement.attr({ y: rect.height/2 + 15 });
+        textElement.attr({ y: rect.height / 2 + 15 });
         rect = textElement.getBBox();
 
         paper.rect(rect.x - 5, rect.y - 5, rect.width + 10, rect.height + 10).attr({
@@ -42,11 +60,6 @@ Alice->Bob</textarea>
             r: 5
         });
         textElement.toFront();
-
-        var lifelinePath = "M" + (rect.x + rect.width/2) + "," + (rect.y + rect.height + 5) + "V1000";
-        var lifeLine = paper.path(lifelinePath);
-        lifeLine.attr({ "stroke-dasharray": "--" });
-        lifeLine.toBack();
 
         return rect.x + rect.width + 5;
     }
@@ -91,13 +104,13 @@ Alice->Bob</textarea>
     function drawArrow(x, y, pointRight) {
         var ARROW_WIDTH = 10;
         var ARROW_HEIGHT = 10;
-        var HALF_ARROW_HEIGHT = ARROW_HEIGHT/2;
+        var HALF_ARROW_HEIGHT = ARROW_HEIGHT / 2;
         var xDelta = pointRight ? -ARROW_WIDTH : ARROW_WIDTH;
         var path = paper.path(
                 "M" + x + "," + y +
-                "l" + xDelta + "," + -HALF_ARROW_HEIGHT +
-                "l0," + ARROW_HEIGHT +
-                "Z");
+                        "l" + xDelta + "," + -HALF_ARROW_HEIGHT +
+                        "l0," + ARROW_HEIGHT +
+                        "Z");
         path.attr({
             fill: 'black'
         });
@@ -113,7 +126,7 @@ Alice->Bob</textarea>
             var toActor = diagram[i][1];
             var from = actorPositions[fromActor] + "," + lastY;
 
-            var mixX = (actorPositions[fromActor] + actorPositions[toActor])/2;
+            var mixX = (actorPositions[fromActor] + actorPositions[toActor]) / 2;
             var label = paper.text(mixX, lastY - 10, diagram[i][2]);
             label.attr({ "font-size": 16 });
 
@@ -135,13 +148,25 @@ Alice->Bob</textarea>
 
             lastY += SPAN;
         }
+
+        return lastY;
+    }
+
+    function drawLifeLines(actorPositions, lastY) {
+        for (var key in actorPositions) {
+            var lifelinePath = "M" + actorPositions[key] + ",40v" + lastY;
+            var lifeLine = paper.path(lifelinePath);
+            lifeLine.attr({ "stroke-dasharray": "--" });
+            lifeLine.toBack();
+        }
     }
 
     function drawDiagram(diagram) {
         paper.clear();
         var actorPositions = drawActors(diagram);
 
-        drawCalls(diagram, actorPositions);
+        var lastY = drawCalls(diagram, actorPositions);
+        drawLifeLines(actorPositions, lastY);
     }
 
     function textToDiagram(text) {
