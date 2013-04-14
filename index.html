@@ -10,7 +10,11 @@
 <div class="container-fluid">
     <div class="row-fluid">
         <div class="span4">
-            <textarea></textarea>
+            <textarea id="sequence-description">Alice->Bob:calls
+Bob->Charlie:passes
+Charlie->Charlie:invokes
+Charlie->Alice:returns
+Alice->Bob</textarea>
         </div>
         <div class="span8" id="drawing">
         </div>
@@ -134,17 +138,46 @@
     }
 
     function drawDiagram(diagram) {
+        paper.clear();
         var actorPositions = drawActors(diagram);
 
         drawCalls(diagram, actorPositions);
     }
 
-    drawDiagram([
-            ["Alice", "Bob", "calls"],
-            ["Bob", "Charlie", "passes"],
-            ["Charlie", "Charlie", "invokes"],
-            ["Charlie", "Alice", "returns"]
-    ]);
+    function textToDiagram(text) {
+        var result = [];
+        var lines = text.match(/[^\r\n]+/g);
+        var i;
+
+        for (i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            var arrowIndex = line.indexOf('->');
+
+            if (arrowIndex > 0) {
+                var from = line.substring(0, arrowIndex);
+                var remainder = line.substring(arrowIndex + 2);
+                var colonIndex = remainder.indexOf(':');
+
+                if (colonIndex < 0) {
+                    result[result.length] = [from, remainder, ""];
+                }
+                else {
+                    var to = remainder.substring(0, colonIndex);
+                    var operation = remainder.substring(colonIndex + 1);
+
+                    result[result.length] = [from, to, operation];
+                }
+            }
+        }
+
+        return result;
+    }
+
+    drawDiagram(textToDiagram($("#sequence-description").val()))
+
+    $("#sequence-description").bind('input propertychange', function () {
+        drawDiagram(textToDiagram($("#sequence-description").val()))
+    });
 
 </script>
 </body>
