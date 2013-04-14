@@ -175,7 +175,7 @@ Alice->Bob</textarea>
         var i;
 
         for (i = 0; i < lines.length; i++) {
-            var line = lines[i];
+            var line = lines[i].replace(/ /g, "");
             var arrowIndex = line.indexOf('->');
 
             if (arrowIndex > 0) {
