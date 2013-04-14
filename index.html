@@ -175,20 +175,20 @@ Alice->Bob</textarea>
         var i;
 
         for (i = 0; i < lines.length; i++) {
-            var line = lines[i].replace(/ /g, "");
+            var line = lines[i];
             var arrowIndex = line.indexOf('->');
 
             if (arrowIndex > 0) {
-                var from = line.substring(0, arrowIndex);
-                var remainder = line.substring(arrowIndex + 2);
+                var from = line.substring(0, arrowIndex).trim();
+                var remainder = line.substring(arrowIndex + 2).trim();
                 var colonIndex = remainder.indexOf(':');
 
                 if (colonIndex < 0) {
                     result[result.length] = [from, remainder, ""];
                 }
                 else {
-                    var to = remainder.substring(0, colonIndex);
-                    var operation = remainder.substring(colonIndex + 1);
+                    var to = remainder.substring(0, colonIndex).trim();
+                    var operation = remainder.substring(colonIndex + 1).trim();
 
                     result[result.length] = [from, to, operation];
                 }
